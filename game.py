@@ -42,6 +42,7 @@ class SnakeGame:
         self.snake_list = [[self.x, self.y]]
         self.snake_length = 1
         self.score = 0
+        self.steps_without_food = 0
         
         self.place_food()
         
@@ -94,12 +95,21 @@ class SnakeGame:
                 
         # Check food
         reward = 0
+        self.steps_without_food += 1
         if self.x == self.foodx and self.y == self.foody:
             self.foodx = round(random.randrange(0, self.width - self.block_size) / 10.0) * 10.0
             self.foody = round(random.randrange(0, self.height - self.block_size) / 10.0) * 10.0
             self.snake_length += 1
             self.score += 1
             reward = 10
+            self.steps_without_food = 0
+            
+        # Starvation check
+        if self.steps_without_food > 100 * self.snake_length:
+            self.game_over = True
+            self.deaths += 1
+            self.score_history.append(self.score)
+            return -10, True, self.score
             
         return reward, False, self.score
 

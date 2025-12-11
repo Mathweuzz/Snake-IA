@@ -4,18 +4,21 @@
         "steps": 1
     },
     "Q-Learning": {
-        "best_score": 1,
-        "deaths": 3,
+        "best_score": 0,
+        "deaths": 6,
         "score_history": [
             0,
             0,
-            1
+            0,
+            0,
+            0,
+            0
         ],
-        "final_epsilon": 0.985074875
+        "final_epsilon": 0.9414801494009999
     },
     "Neuroevolution": {
         "generations": 1,
         "best_fitness_history": [],
-        "current_gen_best": 1
+        "current_gen_best": 102
     }
 }

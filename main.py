@@ -30,7 +30,7 @@ games = [
 hamiltonian_agent = HamiltonianAgent(30, 60)
 q_agent = QLearningAgent(n_actions=4)
 # Input: 11 state features, Hidden: 16, Output: 4 actions
-neuro_agent = NeuroEvolutionAgent(input_size=11, hidden_size=16, output_size=4, population_size=50)
+neuro_agent = NeuroEvolutionAgent(input_size=11, hidden_size=16, output_size=4, population_size=20)
 
 import json
 import time

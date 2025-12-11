@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 class QLearningAgent:
-    def __init__(self, n_actions=4, lr=0.01, gamma=0.9, epsilon=1.0, epsilon_decay=0.995, epsilon_min=0.01):
+    def __init__(self, n_actions=4, lr=0.1, gamma=0.9, epsilon=1.0, epsilon_decay=0.99, epsilon_min=0.01):
         self.n_actions = n_actions
         self.lr = lr
         self.gamma = gamma

@@ -34,7 +34,7 @@ class NeuralNetwork:
         self.W1, self.b1, self.W2, self.b2 = weights
 
 class NeuroEvolutionAgent:
-    def __init__(self, input_size, hidden_size, output_size, population_size=50, mutation_rate=0.1):
+    def __init__(self, input_size, hidden_size, output_size, population_size=20, mutation_rate=0.2):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.output_size = output_size

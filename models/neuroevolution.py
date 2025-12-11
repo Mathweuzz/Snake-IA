@@ -45,6 +45,7 @@ class NeuroEvolutionAgent:
         self.fitness_scores = [0] * population_size
         self.current_individual_idx = 0
         self.generation = 1
+        self.fitness_history = []
 
     def get_action(self, state):
         nn = self.population[self.current_individual_idx]
@@ -91,8 +92,10 @@ class NeuroEvolutionAgent:
             new_population.append(child_nn)
             
         self.population = new_population
+        best_fitness = self.fitness_scores[sorted_indices[0]] if self.fitness_scores else 0
+        self.fitness_history.append(best_fitness)
         self.fitness_scores = [0] * self.population_size
-        print(f"Generation {self.generation} complete. Best fitness: {self.fitness_scores[sorted_indices[0]] if self.fitness_scores else 0}")
+        print(f"Generation {self.generation} complete. Best fitness: {best_fitness}")
 
     def tournament_selection(self, k=3):
         indices = np.random.choice(self.population_size, k)

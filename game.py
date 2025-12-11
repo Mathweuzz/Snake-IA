@@ -25,6 +25,7 @@ class SnakeGame:
         self.best_score = 0
         self.deaths = 0
         self.stats = {} # Dictionary for dynamic stats (LR, Time, etc.)
+        self.score_history = []
         
         self.reset()
 
@@ -74,6 +75,7 @@ class SnakeGame:
         if self.x >= self.width or self.x < 0 or self.y >= self.height or self.y < 0:
             self.game_over = True
             self.deaths += 1
+            self.score_history.append(self.score)
             return -10, True, self.score
             
         # Update snake body
@@ -87,6 +89,7 @@ class SnakeGame:
             if x == snake_head:
                 self.game_over = True
                 self.deaths += 1
+                self.score_history.append(self.score)
                 return -10, True, self.score
                 
         # Check food

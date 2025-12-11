@@ -32,10 +32,13 @@ q_agent = QLearningAgent(n_actions=4)
 # Input: 11 state features, Hidden: 16, Output: 4 actions
 neuro_agent = NeuroEvolutionAgent(input_size=11, hidden_size=16, output_size=4, population_size=50)
 
+import json
 import time
 
 def main():
     start_time = time.time()
+    BENCHMARK_DURATION = 120 # 2 minutes
+    
     running = True
     while running:
         for event in pygame.event.get():
@@ -47,6 +50,32 @@ def main():
         # Calculate stats
         elapsed_time = int(time.time() - start_time)
         time_str = f"{elapsed_time // 60:02d}:{elapsed_time % 60:02d}"
+        
+        # Benchmark Check
+        if elapsed_time >= BENCHMARK_DURATION:
+            print("Benchmark complete. Generating report...")
+            report = {
+                "Hamiltonian": {
+                    "score": games[0].score,
+                    "steps": games[0].snake_length # Proxy for steps/progress
+                },
+                "Q-Learning": {
+                    "best_score": games[1].best_score,
+                    "deaths": games[1].deaths,
+                    "score_history": games[1].score_history,
+                    "final_epsilon": q_agent.epsilon
+                },
+                "Neuroevolution": {
+                    "generations": neuro_agent.generation,
+                    "best_fitness_history": neuro_agent.fitness_history,
+                    "current_gen_best": max(neuro_agent.fitness_scores) if neuro_agent.fitness_scores else 0
+                }
+            }
+            
+            with open("report.json", "w") as f:
+                json.dump(report, f, indent=4)
+                
+            running = False
         
         # Determine leader
         max_score = -1

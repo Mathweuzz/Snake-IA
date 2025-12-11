@@ -14,20 +14,20 @@ pygame.display.set_caption('Snake AI Competition')
 
 clock = pygame.time.Clock()
 
-from models.hamiltonian import HamiltonianAgent
+from models.ppo import PPOAgent
 from models.qlearning import QLearningAgent
 from models.neuroevolution import NeuroEvolutionAgent
 
 # Initialize 3 games
 games = [
-    SnakeGame(GAME_WIDTH, HEIGHT, 0, "Hamiltonian Cycle"),
-    SnakeGame(GAME_WIDTH, HEIGHT, 300, "Q-Learning"),
+    SnakeGame(GAME_WIDTH, HEIGHT, 0, "PPO (Proximal Policy Opt)"),
+    SnakeGame(GAME_WIDTH, HEIGHT, 300, "Q-Learning (D3QN)"),
     SnakeGame(GAME_WIDTH, HEIGHT, 600, "Neuroevolution")
 ]
 
 # Initialize Agents
 # Grid size is 300x600, block size 10 -> 30x60 grid
-hamiltonian_agent = HamiltonianAgent(30, 60)
+ppo_agent = PPOAgent(input_size=24, hidden_size=24, output_size=4)
 q_agent = QLearningAgent(n_actions=4, input_size=24, hidden_size=24)
 # Input: 24 (Vision), Hidden: 24, Output: 4 actions
 neuro_agent = NeuroEvolutionAgent(input_size=24, hidden_size=24, output_size=4, population_size=12)
@@ -55,9 +55,10 @@ def main():
         if elapsed_time >= BENCHMARK_DURATION:
             print("Benchmark complete. Generating report...")
             report = {
-                "Hamiltonian": {
+                "PPO": {
                     "score": games[0].score,
-                    "steps": games[0].snake_length # Proxy for steps/progress
+                    "deaths": games[0].deaths,
+                    "score_history": games[0].score_history
                 },
                 "Q-Learning": {
                     "best_score": games[1].best_score,
@@ -95,8 +96,8 @@ def main():
             game.stats["Leader"] = (i == leader_idx)
             
             # Placeholder for model specific stats
-            if i == 0: # Hamiltonian
-                game.stats["Mode"] = "Deterministic"
+            if i == 0: # PPO
+                game.stats["Mode"] = "PPO"
             elif i == 1: # Q-Learning
                 game.stats["LR"] = f"{q_agent.lr:.4f}"
                 game.stats["Epsilon"] = f"{q_agent.epsilon:.2f}"
@@ -110,10 +111,12 @@ def main():
             if not game.game_over:
                 action = 0
                 state_old = None
+                prob = 0 # For PPO
                 
                 if i == 0:
-                    # Hamiltonian Agent
-                    action = hamiltonian_agent.get_action((game.x, game.y), game.block_size)
+                    # PPO Agent
+                    state_old = game.get_state_vision()
+                    action, prob = ppo_agent.get_action(state_old)
                     
                 elif i == 1:
                     # Q-Learning Agent
@@ -136,6 +139,10 @@ def main():
                     
                     # For Q-Learning, we need the step result to train
                     reward, done, score = game.step(action)
+                    
+                    if i == 0: # Train PPO
+                        ppo_agent.store_transition(state_old, action, prob, reward, done)
+                        ppo_agent.train()
                     
                     if i == 1: # Train Q-Learning
                         state_new = game.get_state()

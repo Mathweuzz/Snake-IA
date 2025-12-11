@@ -28,32 +28,6 @@ $$
 $$
 \bigcup_{k=1}^N \{v_k\} = V \quad \text{and} \quad v_i \neq v_j \text{ for } i \neq j
 $$
-
-By following this cycle, the snake is guaranteed to traverse the entire grid without self-collision, theoretically achieving the maximum possible score (filling the board), albeit not in the most efficient time.
-
-### 2. Q-Learning (Reinforcement Learning)
-
-This model uses **Q-Learning**, a model-free reinforcement learning algorithm. The agent learns an optimal policy $\pi^*$ by maximizing the expected cumulative reward.
-
-**Mathematical Formulation:**
-
-The problem is modeled as a Markov Decision Process (MDP) defined by the tuple $(S, A, P, R, \gamma)$.
-The agent maintains a Q-table $Q(s, a)$ estimating the value of taking action $a$ in state $s$. The Q-values are updated iteratively using the **Bellman Equation**:
-
-$$
-Q^{new}(s_t, a_t) \leftarrow (1 - \alpha) \cdot \underbrace{Q(s_t, a_t)}_{\text{current value}} + \alpha \cdot \left( \underbrace{r_t + \gamma \cdot \max_{a} Q(s_{t+1}, a)}_{\text{target value}} \right)
-$$
-
-Where:
-*   $s_t$: State at time $t$ (e.g., relative food position, obstacles).
-*   $a_t$: Action taken (Up, Down, Left, Right).
-*   $r_t$: Reward received (positive for food, negative for death).
-*   $\alpha \in [0, 1]$: Learning rate.
-*   $\gamma \in [0, 1]$: Discount factor.
-
-The optimal policy $\pi^*(s)$ is derived by selecting the action with the highest Q-value:
-
-$$
 \pi^*(s) = \arg\max_{a \in A} Q(s, a)
 $$
 

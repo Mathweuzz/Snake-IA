@@ -73,6 +73,7 @@ def main():
                 }
             }
             
+            ppo_agent.save_model()
             q_agent.save_model()
             
             with open("report.json", "w") as f:

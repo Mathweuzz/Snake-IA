@@ -169,6 +169,9 @@ class PPOAgent:
         self.rewards = []
         self.dones = []
         self.batch_size = 64 # Steps to collect before update
+        
+        # Load weights if exist
+        self.load_model()
 
     def get_action(self, state):
         action, prob = self.model.get_action(state)
@@ -227,3 +230,20 @@ class PPOAgent:
         self.probs = []
         self.rewards = []
         self.dones = []
+
+    def save_model(self, filename="models/ppo_weights.npy"):
+        weights = [
+            self.model.W1_a, self.model.b1_a, self.model.W2_a, self.model.b2_a,
+            self.model.W1_c, self.model.b1_c, self.model.W2_c, self.model.b2_c
+        ]
+        np.save(filename, np.array(weights, dtype=object))
+        print("PPO model saved.")
+
+    def load_model(self, filename="models/ppo_weights.npy"):
+        try:
+            weights = np.load(filename, allow_pickle=True)
+            self.model.W1_a, self.model.b1_a, self.model.W2_a, self.model.b2_a = weights[0], weights[1], weights[2], weights[3]
+            self.model.W1_c, self.model.b1_c, self.model.W2_c, self.model.b2_c = weights[4], weights[5], weights[6], weights[7]
+            print("PPO model loaded successfully.")
+        except FileNotFoundError:
+            print("No saved PPO model found. Starting from scratch.")

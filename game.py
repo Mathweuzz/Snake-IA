@@ -47,7 +47,7 @@ class SnakeGame:
         self.place_food()
         
         self.last_move_time = pygame.time.get_ticks()
-        self.move_interval = 1000 / self.speed
+        self.move_interval = 50 # Faster for training
 
     def place_food(self):
         self.foodx = round(random.randrange(0, self.width - self.block_size) / 10.0) * 10.0

@@ -38,7 +38,7 @@ class SnakeGame:
         self.y = self.height / 2
         self.x_change = 0
         self.y_change = 0
-        self.snake_list = []
+        self.snake_list = [[self.x, self.y]]
         self.snake_length = 1
         self.score = 0
         
@@ -144,3 +144,63 @@ class SnakeGame:
         if self.game_over:
             msg = self.font_style.render("Game Over", True, RED)
             display.blit(msg, [self.x_offset + self.width/2 - 40, self.height/2])
+
+    def get_state(self):
+        head = self.snake_list[-1]
+        point_l = [head[0] - self.block_size, head[1]]
+        point_r = [head[0] + self.block_size, head[1]]
+        point_u = [head[0], head[1] - self.block_size]
+        point_d = [head[0], head[1] + self.block_size]
+        
+        dir_l = self.x_change == -self.block_size
+        dir_r = self.x_change == self.block_size
+        dir_u = self.y_change == -self.block_size
+        dir_d = self.y_change == self.block_size
+
+        state = [
+            # Danger straight
+            (dir_r and self.is_collision(point_r)) or 
+            (dir_l and self.is_collision(point_l)) or 
+            (dir_u and self.is_collision(point_u)) or 
+            (dir_d and self.is_collision(point_d)),
+
+            # Danger right
+            (dir_u and self.is_collision(point_r)) or 
+            (dir_d and self.is_collision(point_l)) or 
+            (dir_l and self.is_collision(point_u)) or 
+            (dir_r and self.is_collision(point_d)),
+
+            # Danger left
+            (dir_d and self.is_collision(point_r)) or 
+            (dir_u and self.is_collision(point_l)) or 
+            (dir_r and self.is_collision(point_u)) or 
+            (dir_l and self.is_collision(point_d)),
+            
+            # Move direction
+            dir_l,
+            dir_r,
+            dir_u,
+            dir_d,
+            
+            # Food location 
+            self.foodx < self.x,  # Food left
+            self.foodx > self.x,  # Food right
+            self.foody < self.y,  # Food up
+            self.foody > self.y   # Food down
+        ]
+        
+        return np.array(state, dtype=int)
+
+    def is_collision(self, pt=None):
+        if pt is None:
+            pt = [self.x, self.y]
+        
+        # Hits wall
+        if pt[0] >= self.width or pt[0] < 0 or pt[1] >= self.height or pt[1] < 0:
+            return True
+        
+        # Hits self
+        if pt in self.snake_list[:-1]:
+            return True
+        
+        return False

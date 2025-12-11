@@ -94,7 +94,7 @@ class SnakeGame:
                 return -10, True, self.score
                 
         # Check food
-        reward = 0
+        reward = -0.1 # Living penalty
         self.steps_without_food += 1
         if self.x == self.foodx and self.y == self.foody:
             self.foodx = round(random.randrange(0, self.width - self.block_size) / 10.0) * 10.0

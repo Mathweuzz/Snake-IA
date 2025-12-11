@@ -69,9 +69,22 @@ class SnakeGame:
             self.x_change = 0
             
         # Move snake
+        # Calculate old distance
+        old_dist = ((self.x - self.foodx)**2 + (self.y - self.foody)**2)**0.5
+        
+        # Move snake
         self.x += self.x_change
         self.y += self.y_change
         
+        # Calculate new distance
+        new_dist = ((self.x - self.foodx)**2 + (self.y - self.foody)**2)**0.5
+        
+        # Distance Reward
+        if new_dist < old_dist:
+            reward = 0.1
+        else:
+            reward = -0.1
+            
         # Check boundaries
         if self.x >= self.width or self.x < 0 or self.y >= self.height or self.y < 0:
             self.game_over = True
@@ -94,7 +107,6 @@ class SnakeGame:
                 return -10, True, self.score
                 
         # Check food
-        reward = -0.1 # Living penalty
         self.steps_without_food += 1
         if self.x == self.foodx and self.y == self.foody:
             self.foodx = round(random.randrange(0, self.width - self.block_size) / 10.0) * 10.0

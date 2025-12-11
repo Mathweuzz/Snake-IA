@@ -1,7 +1,7 @@
 {
     "Hamiltonian": {
-        "score": 0,
-        "steps": 1
+        "score": 1,
+        "steps": 2
     },
     "Q-Learning": {
         "best_score": 0,
@@ -28,11 +28,12 @@
         "final_epsilon": 0.8429431933839266
     },
     "Neuroevolution": {
-        "generations": 3,
+        "generations": 4,
         "best_fitness_history": [
+            102,
             203,
             1
         ],
-        "current_gen_best": 102
+        "current_gen_best": 1
     }
 }

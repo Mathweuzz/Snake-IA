@@ -16,18 +16,21 @@ clock = pygame.time.Clock()
 
 from models.hamiltonian import HamiltonianAgent
 from models.qlearning import QLearningAgent
+from models.neuroevolution import NeuroEvolutionAgent
 
 # Initialize 3 games
 games = [
     SnakeGame(GAME_WIDTH, HEIGHT, 0, "Hamiltonian Cycle"),
     SnakeGame(GAME_WIDTH, HEIGHT, 300, "Q-Learning"),
-    SnakeGame(GAME_WIDTH, HEIGHT, 600, "Model 3")
+    SnakeGame(GAME_WIDTH, HEIGHT, 600, "Neuroevolution")
 ]
 
 # Initialize Agents
 # Grid size is 300x600, block size 10 -> 30x60 grid
 hamiltonian_agent = HamiltonianAgent(30, 60)
 q_agent = QLearningAgent(n_actions=4)
+# Input: 11 state features, Hidden: 16, Output: 4 actions
+neuro_agent = NeuroEvolutionAgent(input_size=11, hidden_size=16, output_size=4, population_size=50)
 
 import time
 
@@ -66,6 +69,9 @@ def main():
             elif i == 1: # Q-Learning
                 game.stats["LR"] = f"{q_agent.lr:.4f}"
                 game.stats["Epsilon"] = f"{q_agent.epsilon:.2f}"
+            elif i == 2: # Neuroevolution
+                game.stats["Gen"] = str(neuro_agent.generation)
+                game.stats["Ind"] = f"{neuro_agent.current_individual_idx + 1}/{neuro_agent.population_size}"
             else:
                 game.stats["LR"] = "0.001" # Placeholder
                 game.stats["Epsilon"] = "0.1" # Placeholder
@@ -83,27 +89,14 @@ def main():
                     state_old = game.get_state()
                     action = q_agent.get_action(state_old)
                     
-                    # We need to step and get reward
-                    # But the loop structure was: check time -> step.
-                    # We need to ensure we only train when a step actually happens.
-                    # The previous logic had a time check inside the loop? 
-                    # No, I removed it in the last refactor and put it in main?
-                    # Wait, I need to check the time logic again.
-                    
-                    # Let's look at the previous main.py content via search or just assume standard loop.
-                    # The previous main.py had:
-                    # current_time = pygame.time.get_ticks()
-                    # if current_time - game.last_move_time >= game.move_interval:
-                    #    game.last_move_time = current_time
-                    #    game.step(action)
-                    
-                    # I need to wrap the training logic in this time check.
-                    pass # Logic handled below
+                elif i == 2:
+                    # Neuroevolution Agent
+                    state_old = game.get_state()
+                    action = neuro_agent.get_action(state_old)
                     
                 else:
                     # Random action for others
                     action = random.randint(0, 3)
-                    # game.step(action) # Logic handled below
 
                 # Execute Step if time is right
                 current_time = pygame.time.get_ticks()
@@ -117,9 +110,16 @@ def main():
                         state_new = game.get_state()
                         q_agent.train(state_old, action, reward, state_new, done)
             else:
-                # Auto reset after a delay or just stay dead?
-                # For testing random movement, let's auto reset immediately so we see action
-                game.reset()
+                # Handle Game Over
+                if i == 2: # Neuroevolution
+                    # Record fitness (score + duration bonus maybe? for now just score)
+                    # Let's add a small bonus for surviving to differentiate 0 scores
+                    fitness = game.score * 100 + (game.snake_length) 
+                    neuro_agent.update_fitness(fitness)
+                    neuro_agent.next_individual()
+                    game.reset()
+                else:
+                    game.reset()
 
             game.render(display)
 

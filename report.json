@@ -1,38 +1,33 @@
 {
     "Hamiltonian": {
-        "score": 1,
-        "steps": 2
+        "score": 0,
+        "steps": 1
     },
     "Q-Learning": {
-        "best_score": 0,
-        "deaths": 17,
+        "best_score": 1,
+        "deaths": 13,
         "score_history": [
             0,
             0,
             0,
             0,
+            1,
             0,
             0,
+            1,
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
+            1,
             0,
             0,
             0
         ],
-        "final_epsilon": 0.8429431933839266
+        "final_epsilon": 0.00998645168764533
     },
     "Neuroevolution": {
-        "generations": 4,
+        "generations": 3,
         "best_fitness_history": [
-            102,
-            203,
-            1
+            1,
+            102
         ],
         "current_gen_best": 1
     }

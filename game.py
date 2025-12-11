@@ -170,51 +170,55 @@ class SnakeGame:
             msg = self.font_style.render("Game Over", True, RED)
             display.blit(msg, [self.x_offset + self.width/2 - 40, self.height/2])
 
-    def get_state(self):
-        head = self.snake_list[-1]
-        point_l = [head[0] - self.block_size, head[1]]
-        point_r = [head[0] + self.block_size, head[1]]
-        point_u = [head[0], head[1] - self.block_size]
-        point_d = [head[0], head[1] + self.block_size]
-        
-        dir_l = self.x_change == -self.block_size
-        dir_r = self.x_change == self.block_size
-        dir_u = self.y_change == -self.block_size
-        dir_d = self.y_change == self.block_size
-
-        state = [
-            # Danger straight
-            (dir_r and self.is_collision(point_r)) or 
-            (dir_l and self.is_collision(point_l)) or 
-            (dir_u and self.is_collision(point_u)) or 
-            (dir_d and self.is_collision(point_d)),
-
-            # Danger right
-            (dir_u and self.is_collision(point_r)) or 
-            (dir_d and self.is_collision(point_l)) or 
-            (dir_l and self.is_collision(point_u)) or 
-            (dir_r and self.is_collision(point_d)),
-
-            # Danger left
-            (dir_d and self.is_collision(point_r)) or 
-            (dir_u and self.is_collision(point_l)) or 
-            (dir_r and self.is_collision(point_u)) or 
-            (dir_l and self.is_collision(point_d)),
-            
-            # Move direction
-            dir_l,
-            dir_r,
-            dir_u,
-            dir_d,
-            
-            # Food location 
-            self.foodx < self.x,  # Food left
-            self.foodx > self.x,  # Food right
-            self.foody < self.y,  # Food up
-            self.foody > self.y   # Food down
+    def get_state_vision(self):
+        # 8 Directions: N, NE, E, SE, S, SW, W, NW
+        directions = [
+            (0, -1), (1, -1), (1, 0), (1, 1),
+            (0, 1), (-1, 1), (-1, 0), (-1, -1)
         ]
         
-        return np.array(state, dtype=int)
+        state = []
+        
+        for dx, dy in directions:
+            wall_dist = 0
+            food_dist = 0
+            self_dist = 0
+            
+            x, y = self.x, self.y
+            distance = 0
+            found_food = False
+            found_self = False
+            
+            # Cast ray
+            while True:
+                x += dx * self.block_size
+                y += dy * self.block_size
+                distance += 1
+                
+                # Check Wall
+                if x < 0 or x >= self.width or y < 0 or y >= self.height:
+                    wall_dist = 1.0 / distance
+                    break
+                
+                # Check Food
+                if not found_food and x == self.foodx and y == self.foody:
+                    food_dist = 1.0 / distance
+                    found_food = True
+                
+                # Check Self
+                if not found_self and [x, y] in self.snake_list[:-1]:
+                    self_dist = 1.0 / distance
+                    found_self = True
+            
+            state.extend([wall_dist, food_dist, self_dist])
+            
+        return np.array(state)
+
+    def get_state(self):
+        # Legacy support or alias? Let's keep the old one for reference if needed, 
+        # but main.py will use get_state_vision.
+        # Actually, let's just return the vision state to force upgrade.
+        return self.get_state_vision()
 
     def is_collision(self, pt=None):
         if pt is None:

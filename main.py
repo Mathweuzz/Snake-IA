@@ -28,9 +28,9 @@ games = [
 # Initialize Agents
 # Grid size is 300x600, block size 10 -> 30x60 grid
 hamiltonian_agent = HamiltonianAgent(30, 60)
-q_agent = QLearningAgent(n_actions=4)
-# Input: 11 state features, Hidden: 16, Output: 4 actions
-neuro_agent = NeuroEvolutionAgent(input_size=11, hidden_size=16, output_size=4, population_size=12)
+q_agent = QLearningAgent(n_actions=4, input_size=24, hidden_size=24)
+# Input: 24 (Vision), Hidden: 24, Output: 4 actions
+neuro_agent = NeuroEvolutionAgent(input_size=24, hidden_size=24, output_size=4, population_size=12)
 
 import json
 import time
@@ -71,6 +71,8 @@ def main():
                     "current_gen_best": max(neuro_agent.fitness_scores) if neuro_agent.fitness_scores else 0
                 }
             }
+            
+            q_agent.save_model()
             
             with open("report.json", "w") as f:
                 json.dump(report, f, indent=4)
